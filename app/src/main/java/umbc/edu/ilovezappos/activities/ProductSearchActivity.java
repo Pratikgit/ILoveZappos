@@ -10,6 +10,8 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -24,25 +26,29 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import umbc.edu.ilovezappos.R;
+import umbc.edu.ilovezappos.adapters.ProductListAdapter;
 import umbc.edu.ilovezappos.interfaces.ApiInterface;
 import umbc.edu.ilovezappos.models.Product;
 import umbc.edu.ilovezappos.models.ProductsResponse;
 import umbc.edu.ilovezappos.network.ApiClient;
 import umbc.edu.ilovezappos.utils.Constants;
 import umbc.edu.ilovezappos.utils.Util;
-import umbc.edu.zappossample.R;
 
 public class ProductSearchActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    Toolbar toolbar;
-    FloatingActionButton cartFab;
+    private Toolbar mtoolbar;
+    private FloatingActionButton mCartFab;
     private Context mcontext;
-    DrawerLayout drawer;
-    NavigationView navigationView;
-    ApiInterface apiService;
-    CoordinatorLayout coordinatorLayout;
+    private DrawerLayout mDrawer;
+    private NavigationView mNavigationView;
+    private ApiInterface apiService;
+    private CoordinatorLayout coordinatorLayout;
     private SearchView msearchView;
     private String mSearchQuery;
+    private RecyclerView mRecyclerView;
+    private ProductListAdapter mProductListAdapter;
+    private final int GRID_SPAN_COUNT =2;
 
     private static final String TAG = ProductSearchActivity.class.getSimpleName();
 
@@ -65,6 +71,7 @@ public class ProductSearchActivity extends AppCompatActivity
                 int statusCode = response.code();
                 if(statusCode == 200) {
                     List<Product> products = response.body().getResults();
+                    displayProductList(products);
                     // recyclerView.setAdapter(new MoviesAdapter(movies, R.layout.list_item_movie, getApplicationContext()));
                 }else {
                     Snackbar snackbar = Snackbar.make(coordinatorLayout, getString(R.string.error_message_failure), Snackbar.LENGTH_LONG)
@@ -85,9 +92,20 @@ public class ProductSearchActivity extends AppCompatActivity
         });
     }
 
+    /**
+     * This function displays the list of products fetched in recyler view.
+     * @param productList
+     */
+    private void displayProductList(List<Product> productList) {
+        mProductListAdapter = new ProductListAdapter(mcontext,productList);
+        mRecyclerView.setAdapter(mProductListAdapter);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(mcontext,GRID_SPAN_COUNT));
+
+    }
+
     private void setUpUIElements() {
-        cartFab = (FloatingActionButton) findViewById(R.id.fab);
-        cartFab.setOnClickListener(new View.OnClickListener() {
+        mCartFab = (FloatingActionButton) findViewById(R.id.fab);
+        mCartFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -95,13 +113,13 @@ public class ProductSearchActivity extends AppCompatActivity
             }
         });
 
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+                this, mDrawer, mtoolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawer.setDrawerListener(toggle);
         toggle.syncState();
-        navigationView= (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        mNavigationView= (NavigationView) findViewById(R.id.nav_view);
+        mNavigationView.setNavigationItemSelectedListener(this);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.cordinator_layout);
         msearchView = (SearchView) findViewById(R.id.searchView);
         msearchView.setQueryHint(getResources().getString(R.string.search_title_hint));
@@ -132,12 +150,15 @@ public class ProductSearchActivity extends AppCompatActivity
                 return false;
             }
         });
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.recylerView);
+
     }
 
 
     private void setUpToolbar() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mtoolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mtoolbar);
     }
 
     @Override
