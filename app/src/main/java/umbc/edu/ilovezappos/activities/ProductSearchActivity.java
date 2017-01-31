@@ -19,6 +19,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.List;
@@ -35,6 +36,8 @@ import umbc.edu.ilovezappos.network.ApiClient;
 import umbc.edu.ilovezappos.utils.Constants;
 import umbc.edu.ilovezappos.utils.Util;
 
+import static umbc.edu.ilovezappos.utils.Util.applyWhitneyMedium;
+
 public class ProductSearchActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private Toolbar mtoolbar;
@@ -45,6 +48,7 @@ public class ProductSearchActivity extends AppCompatActivity
     private ApiInterface apiService;
     private CoordinatorLayout coordinatorLayout;
     private SearchView msearchView;
+    private EditText mSearchBox;
     private String mSearchQuery;
     private RecyclerView mRecyclerView;
     private ProductListAdapter mProductListAdapter;
@@ -125,6 +129,9 @@ public class ProductSearchActivity extends AppCompatActivity
         msearchView.setQueryHint(getResources().getString(R.string.search_title_hint));
         msearchView.onActionViewExpanded();
         msearchView.setIconified(false);
+        mSearchBox =((EditText) msearchView.findViewById (android.support.v7.appcompat.R.id.search_src_text));
+        applyWhitneyMedium(mSearchBox,mcontext);
+
         // adding QueryListner
         msearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
 
