@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 import umbc.edu.ilovezappos.R;
@@ -47,6 +49,11 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
         holder.originalPriceTextView.setText(currentProduct.getOriginalPrice());
         holder.discountPriceTextView.setText(currentProduct.getPrice());
         holder.offTextView.setText(currentProduct.getPercentOff());
+        Picasso.with(context)
+                .load(currentProduct.getThumbnailImageUrl())
+                .resize(400,400)
+                .into(holder.productImageView);
+
     }
 
     @Override
