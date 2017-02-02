@@ -1,5 +1,7 @@
 package umbc.edu.ilovezappos.activities;
 
+import android.animation.ObjectAnimator;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -19,7 +21,9 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.List;
@@ -34,6 +38,7 @@ import umbc.edu.ilovezappos.models.Product;
 import umbc.edu.ilovezappos.models.ProductsResponse;
 import umbc.edu.ilovezappos.network.ApiClient;
 import umbc.edu.ilovezappos.utils.Constants;
+import umbc.edu.ilovezappos.utils.CustomProgressBarDialog;
 import umbc.edu.ilovezappos.utils.Util;
 
 import static umbc.edu.ilovezappos.utils.Util.applyWhitneyMedium;
@@ -53,8 +58,8 @@ public class ProductSearchActivity extends AppCompatActivity
     private RecyclerView mRecyclerView;
     private ProductListAdapter mProductListAdapter;
     private final int GRID_SPAN_COUNT =2;
-
     private static final String TAG = ProductSearchActivity.class.getSimpleName();
+    private CustomProgressBarDialog mprogressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,11 +72,13 @@ public class ProductSearchActivity extends AppCompatActivity
     }
 
     private void getProductsAPICall() {
+        showProgressDialog();
         Call<ProductsResponse> call = apiService.getProductList(mSearchQuery, Constants.API_KEY);
         Log.i(TAG+ "Url -> ",call.request().url().toString());
         call.enqueue(new Callback<ProductsResponse>() {
             @Override
             public void onResponse(Call<ProductsResponse> call, Response<ProductsResponse> response) {
+                hideProgressDialog();
                 int statusCode = response.code();
                 if(statusCode == 200) {
                     List<Product> products = response.body().getResults();
@@ -89,6 +96,7 @@ public class ProductSearchActivity extends AppCompatActivity
 
             @Override
             public void onFailure(Call<ProductsResponse> call, Throwable t) {
+                hideProgressDialog();
                 // Log error here since request failed
                 Log.e(TAG, t.toString());
 
@@ -125,6 +133,10 @@ public class ProductSearchActivity extends AppCompatActivity
         mNavigationView= (NavigationView) findViewById(R.id.nav_view);
         mNavigationView.setNavigationItemSelectedListener(this);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.cordinator_layout);
+        // dialog
+        mprogressBar = new CustomProgressBarDialog(mcontext);
+        mprogressBar.setContentView(R.layout.progressbar_custom_layout);
+        mprogressBar.setCancelable(false);
         msearchView = (SearchView) findViewById(R.id.searchView);
         msearchView.setQueryHint(getResources().getString(R.string.search_title_hint));
         msearchView.onActionViewExpanded();
@@ -159,7 +171,6 @@ public class ProductSearchActivity extends AppCompatActivity
         });
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recylerView);
-
     }
 
 
@@ -223,5 +234,21 @@ public class ProductSearchActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    /**
+     * Show the progress dialog
+     */
+    private void showProgressDialog() {
+        if (!mprogressBar.isShowing())
+            mprogressBar.show();
+    }
+
+    /**
+     * Hides the progress dialog if shown
+     */
+    private void hideProgressDialog() {
+        if (mprogressBar.isShowing())
+            mprogressBar.dismiss();
     }
 }
