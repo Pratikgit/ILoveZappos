@@ -10,10 +10,13 @@
     <dimen name="activity_product_search_rl_height">100dp</dimen>
     <dimen name="item_product_padding_2dp">2dp</dimen>
     <dimen name="item_product_padding_3dp">3dp</dimen>
+    <dimen name="item_product_padding_7dp">7dp</dimen>
     <dimen name="item_product_padding_10dp">10dp</dimen>
     <dimen name="item_product_row_height">240dp</dimen>
     <dimen name="item_product_image_height">200dp</dimen>
     <dimen name="item_product_image_width">200dp</dimen>
+    <dimen name="image_product_share_height">28dp</dimen>
+    <dimen name="image_product_share_width">28dp</dimen>
     <dimen name="textsize_super_small">7dp</dimen>
     <dimen name="textsize_small">10dp</dimen>
     <dimen name="textsize_medium">13dp</dimen>
