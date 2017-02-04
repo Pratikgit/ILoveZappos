@@ -1,5 +1,8 @@
 package umbc.edu.ilovezappos.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,7 +10,7 @@ import java.util.Map;
  * Created by Pratik on 25-01-2017.
  */
 
-public class Product {
+public class Product implements Parcelable {
     private String brandName;
     private String thumbnailImageUrl;
     private String productId;
@@ -19,6 +22,31 @@ public class Product {
     private String productUrl;
     private String productName;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+
+    protected Product(Parcel in) {
+        brandName = in.readString();
+        thumbnailImageUrl = in.readString();
+        productId = in.readString();
+        originalPrice = in.readString();
+        styleId = in.readString();
+        colorId = in.readString();
+        price = in.readString();
+        percentOff = in.readString();
+        productUrl = in.readString();
+        productName = in.readString();
+    }
+
+    public static final Creator<Product> CREATOR = new Creator<Product>() {
+        @Override
+        public Product createFromParcel(Parcel in) {
+            return new Product(in);
+        }
+
+        @Override
+        public Product[] newArray(int size) {
+            return new Product[size];
+        }
+    };
 
     public String getBrandName() {
         return brandName;
@@ -108,4 +136,22 @@ public class Product {
         this.additionalProperties.put(name, value);
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(brandName);
+        parcel.writeString(thumbnailImageUrl);
+        parcel.writeString(productId);
+        parcel.writeString(originalPrice);
+        parcel.writeString(styleId);
+        parcel.writeString(colorId);
+        parcel.writeString(price);
+        parcel.writeString(percentOff);
+        parcel.writeString(productUrl);
+        parcel.writeString(productName);
+    }
 }
