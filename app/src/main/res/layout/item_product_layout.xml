@@ -8,6 +8,10 @@
         <variable
             name="product"
             type="umbc.edu.ilovezappos.models.Product" />
+
+        <variable
+            name="presenter"
+            type="umbc.edu.ilovezappos.presenters.ProductSearchActivityPresenter" />
     </data>
 
     <RelativeLayout
@@ -18,33 +22,42 @@
         android:background="@color/icons"
         android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/image_product"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/rl_productdetails"
-            android:layout_centerInParent="true"
             android:layout_alignParentTop="true"
-            app:imageUrl="@{product.thumbnailImageUrl}"
-            tools:background="@drawable/ic_menu_gallery" />
+            android:layout_centerInParent="true"
+            android:onClick="@{() -> presenter.onItemClick(product)}">
+
+            <ImageView
+                android:id="@+id/image_product"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                app:imageUrl="@{product.thumbnailImageUrl}"
+                tools:background="@drawable/ic_menu_gallery" />
+
+        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/rl_productdetails"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+            android:paddingBottom="@dimen/item_product_padding_10dp"
             android:paddingLeft="@dimen/item_product_padding_7dp"
             android:paddingRight="@dimen/item_product_padding_3dp"
-            android:paddingBottom="@dimen/item_product_padding_10dp"
             android:paddingTop="@dimen/item_product_padding_10dp">
 
             <LinearLayout
                 android:id="@+id/ll_productdetails"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/ll_productshare"
                 android:layout_alignParentLeft="true"
                 android:layout_toLeftOf="@+id/ll_productshare"
-                android:layout_alignBottom="@+id/ll_productshare"
+                android:onClick="@{() -> presenter.onItemClick(product)}"
                 android:orientation="vertical">
 
                 <TextView
@@ -81,9 +94,9 @@
                         android:layout_marginLeft="@dimen/textsize_super_small"
                         android:text="@{product.originalPrice}"
                         android:textSize="@dimen/textsize_11dp"
+                        app:addStrike="@{product.percentOff}"
                         app:fontMedium="@{``}"
                         app:hideDiscountText="@{product.percentOff}"
-                        app:addStrike="@{product.percentOff}"
                         tools:text="$2000" />
 
                     <TextView
@@ -126,6 +139,7 @@
                     android:layout_height="28dp"
                     android:layout_above="@+id/rl_productdetails"
                     android:layout_alignParentTop="true"
+                    android:onClick="@{() -> presenter.onShareClick(product)}"
                     android:src="@drawable/ic_product_share" />
 
                 <ImageView
@@ -134,8 +148,9 @@
                     android:layout_height="28dp"
                     android:layout_above="@+id/rl_productdetails"
                     android:layout_alignParentTop="true"
-                    android:src="@drawable/ic_add_to_cart"
-                    android:background="@drawable/imageview_circle_bg_lightgrey"/>
+                    android:background="@drawable/imageview_circle_bg_lightgrey"
+                    android:onClick="@{() -> presenter.onAddToCartClick()}"
+                    android:src="@drawable/ic_add_to_cart" />
             </LinearLayout>
 
         </RelativeLayout>

@@ -1,7 +1,5 @@
 package umbc.edu.ilovezappos.activities;
 
-import android.animation.ObjectAnimator;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -21,10 +19,9 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -34,6 +31,7 @@ import retrofit2.Response;
 import umbc.edu.ilovezappos.R;
 import umbc.edu.ilovezappos.adapters.ProductListAdapter;
 import umbc.edu.ilovezappos.interfaces.ApiInterface;
+import umbc.edu.ilovezappos.interfaces.CallbackInterface;
 import umbc.edu.ilovezappos.models.Product;
 import umbc.edu.ilovezappos.models.ProductsResponse;
 import umbc.edu.ilovezappos.network.ApiClient;
@@ -44,7 +42,7 @@ import umbc.edu.ilovezappos.utils.Util;
 import static umbc.edu.ilovezappos.utils.Util.applyWhitneyMedium;
 
 public class ProductSearchActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, CallbackInterface {
     private Toolbar mtoolbar;
     private FloatingActionButton mCartFab;
     private Context mcontext;
@@ -57,34 +55,37 @@ public class ProductSearchActivity extends AppCompatActivity
     private String mSearchQuery;
     private RecyclerView mRecyclerView;
     private ProductListAdapter mProductListAdapter;
-    private final int GRID_SPAN_COUNT =2;
+    private final int GRID_SPAN_COUNT = 2;
     private static final String TAG = ProductSearchActivity.class.getSimpleName();
     private CustomProgressBarDialog mprogressBar;
+    private CallbackInterface mCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_search);
         mcontext = this;
+        mCallback = this;
         setUpToolbar();
         setUpUIElements();
         apiService = ApiClient.getClient().create(ApiInterface.class);
+
     }
 
     private void getProductsAPICall() {
         showProgressDialog();
         Call<ProductsResponse> call = apiService.getProductList(mSearchQuery, Constants.API_KEY);
-        Log.i(TAG+ "Url -> ",call.request().url().toString());
+        Log.i(TAG + "Url -> ", call.request().url().toString());
         call.enqueue(new Callback<ProductsResponse>() {
             @Override
             public void onResponse(Call<ProductsResponse> call, Response<ProductsResponse> response) {
                 hideProgressDialog();
                 int statusCode = response.code();
-                if(statusCode == 200) {
+                if (statusCode == 200) {
                     List<Product> products = response.body().getResults();
                     displayProductList(products);
                     // recyclerView.setAdapter(new MoviesAdapter(movies, R.layout.list_item_movie, getApplicationContext()));
-                }else {
+                } else {
                     Snackbar snackbar = Snackbar.make(coordinatorLayout, getString(R.string.error_message_failure), Snackbar.LENGTH_LONG)
                             .setAction("Action", null);
                     View view = snackbar.getView();
@@ -106,12 +107,13 @@ public class ProductSearchActivity extends AppCompatActivity
 
     /**
      * This function displays the list of products fetched in recyler view.
+     *
      * @param productList
      */
     private void displayProductList(List<Product> productList) {
-        mProductListAdapter = new ProductListAdapter(mcontext,productList);
+        mProductListAdapter = new ProductListAdapter(mcontext, productList, mCallback);
         mRecyclerView.setAdapter(mProductListAdapter);
-        mRecyclerView.setLayoutManager(new GridLayoutManager(mcontext,GRID_SPAN_COUNT));
+        mRecyclerView.setLayoutManager(new GridLayoutManager(mcontext, GRID_SPAN_COUNT));
 
     }
 
@@ -130,7 +132,7 @@ public class ProductSearchActivity extends AppCompatActivity
                 this, mDrawer, mtoolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawer.setDrawerListener(toggle);
         toggle.syncState();
-        mNavigationView= (NavigationView) findViewById(R.id.nav_view);
+        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         mNavigationView.setNavigationItemSelectedListener(this);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.cordinator_layout);
         // dialog
@@ -141,24 +143,24 @@ public class ProductSearchActivity extends AppCompatActivity
         msearchView.setQueryHint(getResources().getString(R.string.search_title_hint));
         msearchView.onActionViewExpanded();
         msearchView.setIconified(false);
-        mSearchBox =((EditText) msearchView.findViewById (android.support.v7.appcompat.R.id.search_src_text));
-        applyWhitneyMedium(mSearchBox,mcontext);
+        mSearchBox = ((EditText) msearchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
+        applyWhitneyMedium(mSearchBox, mcontext);
 
         // adding QueryListner
-        msearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
+        msearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             @Override
             public boolean onQueryTextSubmit(String s) {
                 mSearchQuery = s.trim();
-                if(Util.isNetworkConnected(mcontext))
+                if (Util.isNetworkConnected(mcontext))
                     getProductsAPICall();
-                else{
+                else {
                     // Snackbar to show connectivity error
                     Snackbar snackbar = Snackbar.make(coordinatorLayout, getString(R.string.error_message_connection_error), Snackbar.LENGTH_LONG)
                             .setAction("Action", null);
                     View view = snackbar.getView();
                     TextView tv = (TextView) view.findViewById(android.support.design.R.id.snackbar_text);
-                    tv.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER);
+                    tv.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER);
                     snackbar.show();
                 }
                 return false;
@@ -228,6 +230,7 @@ public class ProductSearchActivity extends AppCompatActivity
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_send) {
 
         }
 
@@ -250,5 +253,18 @@ public class ProductSearchActivity extends AppCompatActivity
     private void hideProgressDialog() {
         if (mprogressBar.isShowing())
             mprogressBar.dismiss();
+    }
+
+    @Override
+    public void onRecyclerItemClick(Product product) {
+    }
+
+    @Override
+    public void onRecyclerShareClick(Product product) {
+
+    }
+
+    @Override
+    public void onAddToCartClick() {
     }
 }
