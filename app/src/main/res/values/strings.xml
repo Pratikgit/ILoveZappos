@@ -7,5 +7,10 @@
     <string name="error_message_failure">Failed to fetch products. Please try later. </string>
     <string name="error_message_connection_error">No Internet Connection. Please check your Internet connection.</string>
     <string name="search_title_hint">Search for Brands &amp; Products</string>
+    <string name="button_title_info">+INFO</string>
+    <string name="button_title_return_policy">365 Day return policy</string>
+    <string name="title_return_policy_content">If you are not 100% satisfied with your purchase, you can return your order to the warehouse for a full refund. We believe that in order to have the best possible online/mobile shopping experience, our customers should not have to pay for domestic return shipping. So if for whatever reason you\'re not happy with your purchase, just go through our easy self-service return process (via My Account) to print out a free return label - your domestic shipping costs are prepaid.</string>
+    <string name="button_title_whishlist">WISHLIST</string>
+    <string name="button_title_addtocart">ADD TO CART</string>
 
 </resources>

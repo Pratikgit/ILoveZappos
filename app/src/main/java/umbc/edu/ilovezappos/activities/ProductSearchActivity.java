@@ -1,6 +1,7 @@
 package umbc.edu.ilovezappos.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -257,6 +258,9 @@ public class ProductSearchActivity extends AppCompatActivity
 
     @Override
     public void onRecyclerItemClick(Product product) {
+        Intent intent = new Intent(ProductSearchActivity.this,ProductDetailActivity.class);
+        intent.putExtra("product",product);
+        startActivity(intent);
     }
 
     @Override
