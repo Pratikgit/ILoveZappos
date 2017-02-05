@@ -38,6 +38,7 @@ import umbc.edu.ilovezappos.models.ProductsResponse;
 import umbc.edu.ilovezappos.network.ApiClient;
 import umbc.edu.ilovezappos.utils.Constants;
 import umbc.edu.ilovezappos.utils.CustomProgressBarDialog;
+import umbc.edu.ilovezappos.utils.URLFactory;
 import umbc.edu.ilovezappos.utils.Util;
 
 import static umbc.edu.ilovezappos.utils.Util.applyWhitneyMedium;
@@ -85,7 +86,6 @@ public class ProductSearchActivity extends AppCompatActivity
                 if (statusCode == 200) {
                     List<Product> products = response.body().getResults();
                     displayProductList(products);
-                    // recyclerView.setAdapter(new MoviesAdapter(movies, R.layout.list_item_movie, getApplicationContext()));
                 } else {
                     Snackbar snackbar = Snackbar.make(coordinatorLayout, getString(R.string.error_message_failure), Snackbar.LENGTH_LONG)
                             .setAction("Action", null);
@@ -258,14 +258,17 @@ public class ProductSearchActivity extends AppCompatActivity
 
     @Override
     public void onRecyclerItemClick(Product product) {
-        Intent intent = new Intent(ProductSearchActivity.this,ProductDetailActivity.class);
-        intent.putExtra("product",product);
+        Intent intent = new Intent(ProductSearchActivity.this, ProductDetailActivity.class);
+        intent.putExtra("product", product);
         startActivity(intent);
     }
 
     @Override
     public void onRecyclerShareClick(Product product) {
-
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, URLFactory.BASE_URL+"&"+mSearchQuery+"&"+product.getProductId());
+        startActivity(Intent.createChooser(shareIntent, "Share link using"));
     }
 
     @Override
