@@ -20,10 +20,13 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -61,6 +64,9 @@ public class ProductSearchActivity extends AppCompatActivity
     private static final String TAG = ProductSearchActivity.class.getSimpleName();
     private CustomProgressBarDialog mprogressBar;
     private CallbackInterface mCallback;
+    private ArrayList<Product> mProductList;
+    private final String PRODUCT_LIST_STATE = "product_list";
+    private boolean addedToCartFlag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +77,14 @@ public class ProductSearchActivity extends AppCompatActivity
         setUpToolbar();
         setUpUIElements();
         apiService = ApiClient.getClient().create(ApiInterface.class);
+        if (savedInstanceState != null) {
+            mProductList = new ArrayList<Product>();
+            mProductList = savedInstanceState.getParcelableArrayList(PRODUCT_LIST_STATE);
+            if (mProductList != null) {
+                displayProductList(mProductList);
+            }
+        }
+
 
     }
 
@@ -84,8 +98,9 @@ public class ProductSearchActivity extends AppCompatActivity
                 hideProgressDialog();
                 int statusCode = response.code();
                 if (statusCode == 200) {
-                    List<Product> products = response.body().getResults();
-                    displayProductList(products);
+                    mProductList = new ArrayList<Product>();
+                    mProductList.addAll(response.body().getResults());
+                    displayProductList(mProductList);
                 } else {
                     Snackbar snackbar = Snackbar.make(coordinatorLayout, getString(R.string.error_message_failure), Snackbar.LENGTH_LONG)
                             .setAction("Action", null);
@@ -123,11 +138,10 @@ public class ProductSearchActivity extends AppCompatActivity
         mCartFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                showCartAnimation();
             }
         });
-
+        mCartFab.setBackgroundTintList(getResources().getColorStateList(R.color.colorPrimaryDark));
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawer, mtoolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -183,16 +197,6 @@ public class ProductSearchActivity extends AppCompatActivity
     }
 
     @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
@@ -240,6 +244,29 @@ public class ProductSearchActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(PRODUCT_LIST_STATE, mProductList);
+    }
+
+    private void showCartAnimation(){
+        mCartFab.clearAnimation();
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.pop_down);
+        mCartFab.startAnimation(animation);
+        if(addedToCartFlag){
+            // already added to cart ..
+            mCartFab.setBackgroundTintList(getResources().getColorStateList(R.color.colorPrimaryDark));
+            mCartFab.setImageResource(R.drawable.ic_add_to_cart);
+            addedToCartFlag = false;
+        }else {
+            addedToCartFlag = true;
+            mCartFab.setBackgroundTintList(getResources().getColorStateList(R.color.colorPrimary));
+            mCartFab.setImageResource(R.drawable.ic_shopping_cart);
+        }
+        animation = AnimationUtils.loadAnimation(this, R.anim.pop_up);
+        mCartFab.startAnimation(animation);
+    }
     /**
      * Show the progress dialog
      */
@@ -273,5 +300,17 @@ public class ProductSearchActivity extends AppCompatActivity
 
     @Override
     public void onAddToCartClick() {
+        showCartAnimation();
     }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
 }

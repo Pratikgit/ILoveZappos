@@ -150,7 +150,7 @@
                     android:layout_alignParentTop="true"
                     android:background="@drawable/imageview_circle_bg_lightgrey"
                     android:onClick="@{() -> presenter.onAddToCartClick()}"
-                    android:src="@drawable/ic_add_to_cart" />
+                    android:src="@drawable/ic_shopping_basket" />
             </LinearLayout>
 
         </RelativeLayout>
