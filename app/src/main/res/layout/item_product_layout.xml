@@ -139,6 +139,7 @@
                     android:layout_height="28dp"
                     android:layout_above="@+id/rl_productdetails"
                     android:layout_alignParentTop="true"
+                    android:background="@drawable/ripple_effect"
                     android:onClick="@{() -> presenter.onShareClick(product)}"
                     android:src="@drawable/ic_product_share" />
 

@@ -129,9 +129,9 @@ public class ProductSearchActivity extends AppCompatActivity
      */
     private void displayProductList(List<Product> productList) {
         mProductListAdapter = new ProductListAdapter(mcontext, productList, mCallback);
+        mRecyclerView.setBackgroundResource(R.color.color_lightgrey_Bg);
         mRecyclerView.setAdapter(mProductListAdapter);
         mRecyclerView.setLayoutManager(new GridLayoutManager(mcontext, GRID_SPAN_COUNT));
-
     }
 
     private void setUpUIElements() {
@@ -189,6 +189,7 @@ public class ProductSearchActivity extends AppCompatActivity
         });
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recylerView);
+        mRecyclerView.setBackgroundResource(R.drawable.ic_clearance_sale);
     }
 
 
