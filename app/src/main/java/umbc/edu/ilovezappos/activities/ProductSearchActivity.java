@@ -99,6 +99,7 @@ public class ProductSearchActivity extends AppCompatActivity
                 hideProgressDialog();
                 int statusCode = response.code();
                 if (statusCode == 200) {
+                    msearchView.clearFocus();
                     mProductList = new ArrayList<Product>();
                     mProductList.addAll(response.body().getResults());
                     if (mProductList.size() == 0) {
