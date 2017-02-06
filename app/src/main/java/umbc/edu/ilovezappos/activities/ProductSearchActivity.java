@@ -67,6 +67,7 @@ public class ProductSearchActivity extends AppCompatActivity
     private ArrayList<Product> mProductList;
     private final String PRODUCT_LIST_STATE = "product_list";
     private boolean addedToCartFlag = false;
+    private Snackbar mSnackBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,14 +101,13 @@ public class ProductSearchActivity extends AppCompatActivity
                 if (statusCode == 200) {
                     mProductList = new ArrayList<Product>();
                     mProductList.addAll(response.body().getResults());
-                    displayProductList(mProductList);
+                    if (mProductList.size() == 0) {
+                        showSnackBar(getString(R.string.error_message_no_data_found));
+                    } else {
+                        displayProductList(mProductList);
+                    }
                 } else {
-                    Snackbar snackbar = Snackbar.make(coordinatorLayout, getString(R.string.error_message_failure), Snackbar.LENGTH_LONG)
-                            .setAction("Action", null);
-                    View view = snackbar.getView();
-                    TextView tv = (TextView) view.findViewById(android.support.design.R.id.snackbar_text);
-                    tv.setGravity(Gravity.CENTER_HORIZONTAL);
-                    snackbar.show();
+                    showSnackBar(getString(R.string.error_message_failure));
                 }
             }
 
@@ -250,16 +250,16 @@ public class ProductSearchActivity extends AppCompatActivity
         outState.putParcelableArrayList(PRODUCT_LIST_STATE, mProductList);
     }
 
-    private void showCartAnimation(){
+    private void showCartAnimation() {
         mCartFab.clearAnimation();
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.pop_down);
         mCartFab.startAnimation(animation);
-        if(addedToCartFlag){
+        if (addedToCartFlag) {
             // already added to cart ..
             mCartFab.setBackgroundTintList(getResources().getColorStateList(R.color.colorPrimaryDark));
             mCartFab.setImageResource(R.drawable.ic_add_to_cart);
             addedToCartFlag = false;
-        }else {
+        } else {
             addedToCartFlag = true;
             mCartFab.setBackgroundTintList(getResources().getColorStateList(R.color.colorPrimary));
             mCartFab.setImageResource(R.drawable.ic_shopping_cart);
@@ -267,6 +267,7 @@ public class ProductSearchActivity extends AppCompatActivity
         animation = AnimationUtils.loadAnimation(this, R.anim.pop_up);
         mCartFab.startAnimation(animation);
     }
+
     /**
      * Show the progress dialog
      */
@@ -294,7 +295,7 @@ public class ProductSearchActivity extends AppCompatActivity
     public void onRecyclerShareClick(Product product) {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, URLFactory.BASE_URL+"&"+mSearchQuery+"&"+product.getProductId());
+        shareIntent.putExtra(Intent.EXTRA_TEXT, URLFactory.BASE_URL + "&" + mSearchQuery + "&" + product.getProductId());
         startActivity(Intent.createChooser(shareIntent, "Share link using"));
     }
 
@@ -311,6 +312,15 @@ public class ProductSearchActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+    }
+
+    public void showSnackBar(String message) {
+        mSnackBar = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG)
+                .setAction("Action", null);
+        View view = mSnackBar.getView();
+        TextView tv = (TextView) view.findViewById(android.support.design.R.id.snackbar_text);
+        tv.setGravity(Gravity.CENTER_HORIZONTAL);
+        mSnackBar.show();
     }
 
 }
