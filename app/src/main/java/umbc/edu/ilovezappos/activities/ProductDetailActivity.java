@@ -30,6 +30,7 @@ import umbc.edu.ilovezappos.utils.CustomProgressBarDialog;
 
 /**
  * Created by Pratik on 04-02-2017.
+ *  This activity displays the detailed view of Product selected or shared
  */
 
 public class ProductDetailActivity extends AppCompatActivity {
@@ -140,9 +141,13 @@ public class ProductDetailActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ProductsResponse> call, Throwable t) {
                 hideProgressDialog();
-                // Log error here since request failed
                 Log.e(TAG, t.toString());
-
+                Snackbar snackbar = Snackbar.make(coordinatorLayout, getString(R.string.error_message_failure), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null);
+                View view = snackbar.getView();
+                TextView tv = (TextView) view.findViewById(android.support.design.R.id.snackbar_text);
+                tv.setGravity(Gravity.CENTER_HORIZONTAL);
+                snackbar.show();
             }
         });
     }
